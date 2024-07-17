@@ -1,0 +1,9 @@
+version: '3'
+
+# containers
+services:
+  inception:
+    build: ./all
+    ports:
+      - "80:80"
+    tty: true
