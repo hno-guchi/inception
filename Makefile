@@ -16,6 +16,7 @@ $(NAME):
 
 .PHONY: clean
 clean:
+	./down.sh
 
 .PHONY: fclean
 fclean: clean

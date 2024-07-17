@@ -12,6 +12,8 @@ services:
       MYSQL_USER: myuser
       MYSQL_PASSWORD: mypassword
     volumes:
-      - db_data:/var/lib/mysql
+      - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
+      - ./requirements/mariadb/data:/var/lib/mysql
+
 volumes:
   db_data:
