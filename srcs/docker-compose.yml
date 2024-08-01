@@ -14,6 +14,7 @@ services:
     volumes:
       - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - ./requirements/mariadb/data:/var/lib/mysql
+    tty: true
 
 volumes:
   db_data:
