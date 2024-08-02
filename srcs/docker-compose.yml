@@ -1,33 +1,53 @@
 version: '3'
 
-# containers
 services:
   mariadb:
     build: ./requirements/mariadb
+    container_name: mariadb
+    restart: on-failure:5
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: user
-      MYSQL_PASSWORD: userpass
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: $(DB_NAME)
+      MYSQL_USER: $(DB_USER)
+      MYSQL_PASSWORD: $(DB_PASSWORD)
     volumes:
       - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - ./requirements/mariadb/data:/var/lib/mysql
-    tty: true
-
-  nginx:
-    build: ./requirements/nginx
-    container_name: nginx
-    ports:
-      - "443:443"
-    # depends_on:
-    #   - phpmyadmin
     networks:
-      - wordpress
+      - pmanetwork
+
+  phpmyadmin:
+    build: ./requirements/bonus/phpmyadmin
+    container_name: phpmyadmin
+    restart: on-failure:5
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: ${PMA_HOST_NAME}
+      PMA_ALLOW_NO_PASSWORD: false
+      PMA_USER: ${PMA_USER_NAME}
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD}
+    depends_on:
+      - mariadb
+    networks:
+      - pmanetwork
+
+      # nginx:
+      #   build: ./requirements/nginx
+      #   container_name: nginx
+      #   ports:
+      #     - "443:443"
+      #   depends_on:
+      #     - phpmyadmin
+      #   networks:
+      #     - wpnetwork
+      #     # - pmanetwork
 
 networks:
-  wordpress:
+  # wpnetwork:
+  pmanetwork:
 
 volumes:
   db_data:

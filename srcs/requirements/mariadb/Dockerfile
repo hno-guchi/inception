@@ -11,5 +11,4 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # ENTRYPOINTディレクティブでスクリプトを指定
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# MariaDBを起動するためのCMD
 CMD ["mysqld"]
