@@ -7,14 +7,27 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydatabase
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
     volumes:
       - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - ./requirements/mariadb/data:/var/lib/mysql
     tty: true
+
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    ports:
+      - "443:443"
+    # depends_on:
+    #   - phpmyadmin
+    networks:
+      - wordpress
+
+networks:
+  wordpress:
 
 volumes:
   db_data:
