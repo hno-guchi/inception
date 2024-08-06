@@ -2,19 +2,21 @@
 
 set -e
 
+echo "Starting entrypoint script..."
+
 # MariaDBの初期化
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo 'Initializing database...'
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
     echo 'Database initialized.'
     echo 'Starting temporary MariaDB server...'
-    mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
+    mysqld_safe --skip-networking &
     pid="$!"
 
     mysql=( mysql --protocol=socket -uroot )
 
     for i in {30..0}; do
-        if echo 'SELECT 1' | "${mysql[@]}" &> /dev/null; then
+        if mysqladmin ping --silent; then
             break
         fi
         echo 'MariaDB init process in progress...'
@@ -37,6 +39,11 @@ GRANT ALL ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOSQL
 
+    echo "Creating guest user without privileges..."
+    "${mysql[@]}" <<EOSQL
+CREATE USER '${GUEST_USER}'@'%' IDENTIFIED BY '${GUEST_USER_PASSWORD}';
+EOSQL
+
     echo 'Removing temporary server...'
     if ! kill -s TERM "$pid" || ! wait "$pid"; then
         echo >&2 'MariaDB init process failed.'
@@ -47,4 +54,5 @@ EOSQL
 fi
 
 # MariaDBデーモンを起動
+echo "Starting MariaDB server..."
 exec mysqld --user=mysql --console

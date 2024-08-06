@@ -1,53 +1,68 @@
 version: '3'
 
 services:
-  mariadb:
-    build: ./requirements/mariadb
-    container_name: mariadb
-    restart: on-failure:5
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: $(DB_NAME)
-      MYSQL_USER: $(DB_USER)
-      MYSQL_PASSWORD: $(DB_PASSWORD)
-    volumes:
-      - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
-      - ./requirements/mariadb/data:/var/lib/mysql
-    networks:
-      - pmanetwork
+  # mariadb:
+  #   build: ./requirements/mariadb
+  #   container_name: mariadb
+  #   restart: on-failure:5
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     MYSQL_DATABASE: $(DB_NAME)
+  #     MYSQL_USER: $(DB_USER)
+  #     MYSQL_PASSWORD: $(DB_PASSWORD)
+  #     GUEST_USER: $(DB_GUEST_USER)
+  #     GUEST_USER_PASSWORD: $(DB_GUEST_PASSWORD)
+  #   volumes:
+  #     - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
+  #     - ./requirements/mariadb/data:/var/lib/mysql
+      # networks:
+      # - pmanetwork
 
-  phpmyadmin:
-    build: ./requirements/bonus/phpmyadmin
-    container_name: phpmyadmin
-    restart: on-failure:5
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: ${PMA_HOST_NAME}
-      PMA_ALLOW_NO_PASSWORD: false
-      PMA_USER: ${PMA_USER_NAME}
-      PMA_PASSWORD: ${DB_ROOT_PASSWORD}
-    depends_on:
-      - mariadb
-    networks:
-      - pmanetwork
-
-      # nginx:
-      #   build: ./requirements/nginx
-      #   container_name: nginx
+      # phpmyadmin:
+      #   build: ./requirements/bonus/phpmyadmin
+      #   container_name: phpmyadmin
+      #   restart: on-failure:5
       #   ports:
-      #     - "443:443"
+      #     - "8080:80"
+      #   environment:
+      #     PMA_HOST: ${PMA_HOST_NAME}
+      #     PMA_ALLOW_NO_PASSWORD: false
+      #     PMA_USER: ${PMA_USER_NAME}
+      #     PMA_PASSWORD: ${DB_ROOT_PASSWORD}
       #   depends_on:
-      #     - phpmyadmin
+      #     - mariadb
       #   networks:
-      #     - wpnetwork
-      #     # - pmanetwork
+      #     - pmanetwork
+
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+  #    - "443:443"
+    depends_on:
+      - wordpress
+  #     - phpmyadmin
+    networks:
+      - networdpress
+  #     # - pmanetwork
+
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    volumes:
+      - wordpress-data:/var/www/html
+    expose:
+      - 9000
+    networks:
+      - networdpress
 
 networks:
-  # wpnetwork:
-  pmanetwork:
+  networdpress:
+  # pmanetwork:
 
 volumes:
-  db_data:
+  wordpress-data:
+  #   db_data:
