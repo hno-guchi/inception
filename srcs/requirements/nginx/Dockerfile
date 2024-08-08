@@ -1,11 +1,12 @@
 FROM debian:stable-slim
 
-RUN set -x \
+RUN set -xe \
     && groupadd -r nginx \
     && useradd -r -g nginx nginx
-RUN apt update && \
-    apt install -y nginx openssl curl && \
-    rm -rf /var/lib/apt/lists/*
+
+RUN apt update \
+	&& apt install -y nginx openssl curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # nginxのアクセスログを標準出力にリダイレクト
 # nginxのエラーログを標準エラー出力にリダイレクト
@@ -16,22 +17,21 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
     && mkdir /docker-entrypoint.d
 
-# SSL証明書とキーの作成
-# RUN mkdir -p /etc/nginx/ssl && \
-#     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-#     -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt \
-#     -subj "/C=JP/ST=Tokyo/L=Shinjuku/O=42Tokyo/OU=Learner/CN=hnoguchi.42.fr"
-
 # Nginxの設定ファイルをコピー
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./tools/create_key.sh /usr/local/bin/create_key.sh
+
+RUN chmod +x /usr/local/bin/create_key.sh
 
 # デフォルトのサイト設定をコピー
 # COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
-# EXPOSE 80
+EXPOSE 80 443
 
 # STOPSIGINAL: コンテナが停止した時に送信するシグナルを指定
 # SIGQUIT    : ダンプファイルを生成しデバッグ情報を提供する
 STOPSIGNAL SIGQUIT
+
+ENTRYPOINT ["/usr/local/bin/create_key.sh"]
 
 CMD ["nginx", "-g", "daemon off;"]
