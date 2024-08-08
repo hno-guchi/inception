@@ -2,10 +2,8 @@ version: '3'
 
 services:
   inception_mariadb:
+    build: ./requirements/mariadb
     container_name: inception_mariadb
-    # build: ./requirements/mariadb
-    # container_name: inception_mariadb
-    image: mariadb:11.4
     restart: on-failure:5
     environment:
       MYSQL_DATABASE: $(DB_NAME)
@@ -20,12 +18,10 @@ services:
       - inception_mariadb_net
 
   inception_wordpress:
+    build: ./requirements/wordpress
     container_name: inception_wordpress
-    # build: ./requirements/wordpress
-    # container_name: wordpress
     depends_on:
       - inception_mariadb
-    image: wordpress:fpm
     restart: on-failure:5
     volumes:
       - inception_wp_data:/var/www/html
@@ -34,20 +30,18 @@ services:
       WORDPRESS_DB_USER: $(DB_USER)
       WORDPRESS_DB_PASSWORD: $(DB_PASSWORD)
       WORDPRESS_DB_NAME: $(DB_NAME)
-    expose:
-      - "9000"
+    # expose:
+    #   - "9000"
     networks:
       - inception_mariadb_net
       - inception_wordpress_net
 
   inception_nginx:
+    build: ./requirements/nginx
     container_name: inception_nginx
-    # build: ./requirements/nginx
-    # container_name: nginx
-    image: nginx:latest
     restart: on-failure:5
     volumes:
-      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
       - inception_wp_data:/var/www/html
     ports:
       - "80:80"
@@ -56,7 +50,6 @@ services:
       - inception_wordpress
     networks:
       - inception_wordpress_net
-      # - pmanetwork
 
 volumes:
   inception_mariadb_data:
