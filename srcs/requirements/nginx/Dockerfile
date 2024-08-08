@@ -16,8 +16,6 @@ COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 # デフォルトのサイト設定をコピー
 # COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
-# ポート80を公開
 EXPOSE 80
 
-# Nginxをフォアグラウンドで実行
 CMD ["nginx", "-g", "daemon off;"]
