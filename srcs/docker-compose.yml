@@ -1,24 +1,80 @@
 version: '3'
 
 services:
+  inception_mariadb:
+    container_name: inception_mariadb
+    # build: ./requirements/mariadb
+    # container_name: inception_mariadb
+    image: mariadb:11.4
+    restart: on-failure:5
+    environment:
+      MYSQL_DATABASE: $(DB_NAME)
+      MYSQL_USER: $(DB_USER)
+      MYSQL_PASSWORD: $(DB_PASSWORD)
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - inception_mariadb_data:/var/lib/mysql
+    expose:
+      - "3306"
+    networks:
+      - inception_mariadb_net
+
+  inception_wordpress:
+    container_name: inception_wordpress
+    # build: ./requirements/wordpress
+    # container_name: wordpress
+    depends_on:
+      - inception_mariadb
+    image: wordpress:fpm
+    restart: on-failure:5
+    volumes:
+      - inception_wp_data:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: inception_mariadb:3306
+      WORDPRESS_DB_USER: $(DB_USER)
+      WORDPRESS_DB_PASSWORD: $(DB_PASSWORD)
+      WORDPRESS_DB_NAME: $(DB_NAME)
+    expose:
+      - "9000"
+    networks:
+      - inception_mariadb_net
+      - inception_wordpress_net
+
+  inception_nginx:
+    container_name: inception_nginx
+    # build: ./requirements/nginx
+    # container_name: nginx
+    image: nginx:latest
+    restart: on-failure:5
+    volumes:
+      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - inception_wp_data:/var/www/html
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - inception_wordpress
+    networks:
+      - inception_wordpress_net
+      # - pmanetwork
+
+volumes:
+  inception_mariadb_data:
+  inception_wp_data:
+
+networks:
+  inception_mariadb_net:
+    internal: true
+  inception_wordpress_net:
+
   # mariadb:
-  #   build: ./requirements/mariadb
-  #   container_name: mariadb
-  #   restart: on-failure:5
   #   ports:
   #     - "3306:3306"
   #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: $(DB_NAME)
-  #     MYSQL_USER: $(DB_USER)
-  #     MYSQL_PASSWORD: $(DB_PASSWORD)
   #     GUEST_USER: $(DB_GUEST_USER)
   #     GUEST_USER_PASSWORD: $(DB_GUEST_PASSWORD)
   #   volumes:
   #     - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
-  #     - ./requirements/mariadb/data:/var/lib/mysql
-      # networks:
-      # - pmanetwork
 
       # phpmyadmin:
       #   build: ./requirements/bonus/phpmyadmin
@@ -35,34 +91,3 @@ services:
       #     - mariadb
       #   networks:
       #     - pmanetwork
-
-  nginx:
-    build: ./requirements/nginx
-    container_name: nginx
-    ports:
-      - "80:80"
-  #    - "443:443"
-    depends_on:
-      - wordpress
-  #     - phpmyadmin
-    networks:
-      - networdpress
-  #     # - pmanetwork
-
-  wordpress:
-    build: ./requirements/wordpress
-    container_name: wordpress
-    volumes:
-      - wordpress-data:/var/www/html
-    expose:
-      - 9000
-    networks:
-      - networdpress
-
-networks:
-  networdpress:
-  # pmanetwork:
-
-volumes:
-  wordpress-data:
-  #   db_data:
