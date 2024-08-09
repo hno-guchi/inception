@@ -44,8 +44,8 @@ services:
       # - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
       - inception_wp_data:/var/www/html
     ports:
-      - "80:80"
       - "443:443"
+      # - "80:80"
     depends_on:
       - inception_wordpress
     networks:

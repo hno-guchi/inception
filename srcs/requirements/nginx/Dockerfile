@@ -14,24 +14,27 @@ RUN apt update \
 # スクリプトの置き場所として作成
 # カスタム設定やスクリプトを追加するための標準的な手法
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-    && mkdir /docker-entrypoint.d
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+# 複数のスクリプトを実行するためのディレクトリを作成
+# RUN mkdir /docker-entrypoint.d
 
 # Nginxの設定ファイルをコピー
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-COPY ./tools/create_key.sh /usr/local/bin/create_key.sh
+COPY ./tools/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN chmod +x /usr/local/bin/create_key.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # デフォルトのサイト設定をコピー
 # COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80 443
+EXPOSE 443
+# EXPOSE 80 443
 
 # STOPSIGINAL: コンテナが停止した時に送信するシグナルを指定
 # SIGQUIT    : ダンプファイルを生成しデバッグ情報を提供する
 STOPSIGNAL SIGQUIT
 
-ENTRYPOINT ["/usr/local/bin/create_key.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 CMD ["nginx", "-g", "daemon off;"]
