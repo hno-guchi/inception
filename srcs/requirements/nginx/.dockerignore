@@ -1,6 +1,6 @@
 # dir
-conf/
-tools/
+# conf/
+# tools/
 
 *.env
 *.log
