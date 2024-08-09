@@ -1,0 +1,6 @@
+# dir
+conf/
+tools/
+
+*.env
+*.log
