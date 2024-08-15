@@ -1,32 +1,46 @@
-FROM wordpress:fpm
+FROM debian:stable-slim
+
+RUN set -xe \
+    && apt-get update && apt-get install -y \
+    php8.2-fpm \
+    php8.2-mysql \
+    php8.2-gd \
+    php8.2-mbstring \
+    php8.2-xml \
+    php8.2-curl \
+    wget git unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -xe \
+    && wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x wp-cli.phar \
+    && mv wp-cli.phar /usr/local/bin/wp
+
+RUN set -xe \
+    && wget https://wordpress.org/latest.zip \
+    && unzip latest.zip \
+    && mkdir -p /var/www/html \
+    && mv wordpress/* /var/www/html/ \
+    && rm -rf wordpress latest.zip \
+    && chown -R www-data:www-data /var/www/html
+
+# www.confファイルの設定を変更
+RUN sed -i 's|^listen = .*$|listen = 9000|' /etc/php/8.2/fpm/pool.d/www.conf
+
+# 初期設定スクリプトを追加
+COPY ./tools/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+WORKDIR /var/www/html
 
 EXPOSE 9000
 
-# FROM debian:stable-slim
+# HEALTHCHECK CMD curl --fail http://localhost:9000 || exit 1
+HEALTHCHECK CMD pidof php-fpm8.2 || exit 1
 
-# RUN apt-get update && apt-get install -y \
-#     php8.2-fpm \
-#     php8.2-mysql \
-#     php8.2-gd \
-#     php8.2-mbstring \
-#     php8.2-xml \
-#     php8.2-curl \
-#     wget git unzip \
-#     && rm -rf /var/lib/apt/lists/*
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["php-fpm8.2", "-F"]
 
-# NginxとPHP-FPMの設定ファイルをコピー
-# COPY nginx.conf /etc/nginx/nginx.conf
-# COPY default.conf /etc/nginx/sites-available/default
-# RUN wget https://wordpress.org/latest.zip
-# RUN unzip latest.zip
-# RUN mkdir -p /var/www/html
-# RUN mv wordpress /var/www/html/
-# RUN chown -R www-data:www-data /var/www/html
+# FROM wordpress:fpm
 
-# RUN wget https://wordpress.org/latest.zip && \
-#     unzip latest.zip && \
-#     mv wordpress /var/www/html && \
-#     chown -R www-data:www-data /var/www/html
-
-# PHP-FPMの起動
-# CMD ["php-fpm8.2", "-F"]
+# EXPOSE 9000
