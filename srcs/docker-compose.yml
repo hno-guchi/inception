@@ -14,8 +14,6 @@ services:
     volumes:
       - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - inception_mariadb_data:/var/lib/mysql
-    expose:
-      - "3306"
     networks:
       - inception_mariadb_net
 
@@ -27,17 +25,18 @@ services:
     volumes:
       - inception_wp_data:/var/www/html
     environment:
-      WORDPRESS_DB_NAME: ${WP_DB_NAME}
-      WORDPRESS_DB_USER: ${WP_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD}
-      WORDPRESS_DB_HOST: ${WP_DB_HOST}
-      WORDPRESS_HOME: ${WP_HOME}
-      WORDPRESS_TITLE: ${WP_TITLE}
-      WORDPRESS_ADMIN_USER: ${WP_ADMIN_USER}
-      WORDPRESS_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
-      WORDPRESS_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
-    # expose:
-    #   - "9000"
+      WP_DB_NAME: ${WP_DB_NAME}
+      WP_DB_USER: ${WP_DB_USER}
+      WP_DB_PASSWORD: ${WP_DB_PASSWORD}
+      WP_DB_HOST: ${WP_DB_HOST}
+      WP_HOME: ${WP_HOME}
+      WP_TITLE: ${WP_TITLE}
+      WP_ADMIN_USER: ${WP_ADMIN_USER}
+      WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+      WP_SUB_USER: ${WP_SUB_USER}
+      WP_SUB_PASSWORD: ${WP_SUB_PASSWORD}
+      WP_SUB_EMAIL: ${WP_SUB_EMAIL}
     depends_on:
       - inception_mariadb
     networks:
@@ -50,11 +49,9 @@ services:
     container_name: inception_nginx
     restart: on-failure:5
     volumes:
-      # - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
       - inception_wp_data:/var/www/html
     ports:
       - "443:443"
-      # - "80:80"
     depends_on:
       - inception_wordpress
     networks:
