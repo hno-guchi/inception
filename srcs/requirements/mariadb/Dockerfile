@@ -23,5 +23,3 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 3306
 CMD ["mariadbd"]
-
-# FROM mariadb:11.4
