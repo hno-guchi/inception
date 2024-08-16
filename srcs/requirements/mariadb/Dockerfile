@@ -1,4 +1,3 @@
-# FROM mariadb:11.4
 FROM debian:stable-slim
 
 RUN set -ex \
@@ -16,10 +15,13 @@ RUN set -ex \
 
 VOLUME /var/lib/mysql
 
-# COPY docker-entrypoint.sh /usr/local/bin/
-# ENTRYPOINT ["docker-entrypoint.sh"]
+# USER mysql
 
-USER mysql
+COPY ./tools/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 3306
 CMD ["mariadbd"]
+
+# FROM mariadb:11.4
