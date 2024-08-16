@@ -12,6 +12,7 @@ services:
       MYSQL_PASSWORD: ${WP_DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${WP_DB_ROOT_PASSWORD}
     volumes:
+      - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - inception_mariadb_data:/var/lib/mysql
     expose:
       - "3306"
@@ -68,27 +69,23 @@ networks:
     internal: true
   inception_wordpress_net:
 
-  # mariadb:
-  #   ports:
-  #     - "3306:3306"
-  #   environment:
-  #     GUEST_USER: $(DB_GUEST_USER)
-  #     GUEST_USER_PASSWORD: $(DB_GUEST_PASSWORD)
-  #   volumes:
-  #     - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
-
-      # phpmyadmin:
-      #   build: ./requirements/bonus/phpmyadmin
-      #   container_name: phpmyadmin
-      #   restart: on-failure:5
-      #   ports:
-      #     - "8080:80"
-      #   environment:
-      #     PMA_HOST: ${PMA_HOST_NAME}
-      #     PMA_ALLOW_NO_PASSWORD: false
-      #     PMA_USER: ${PMA_USER_NAME}
-      #     PMA_PASSWORD: ${DB_ROOT_PASSWORD}
-      #   depends_on:
-      #     - mariadb
-      #   networks:
-      #     - pmanetwork
+#   mariadb:
+#     environment:
+#       GUEST_USER: $(DB_GUEST_USER)
+#       GUEST_USER_PASSWORD: $(DB_GUEST_PASSWORD)
+#
+#   phpmyadmin:
+#     build: ./requirements/bonus/phpmyadmin
+#     container_name: phpmyadmin
+#     restart: on-failure:5
+#     ports:
+#       - "8080:80"
+#     environment:
+#       PMA_HOST: ${PMA_HOST_NAME}
+#       PMA_ALLOW_NO_PASSWORD: false
+#       PMA_USER: ${PMA_USER_NAME}
+#       PMA_PASSWORD: ${DB_ROOT_PASSWORD}
+#     depends_on:
+#       - mariadb
+#     networks:
+#       - pmanetwork
