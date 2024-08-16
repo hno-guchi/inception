@@ -3,6 +3,7 @@ version: '3'
 services:
   inception_mariadb:
     build: ./requirements/mariadb
+    image: inception_mariadb:latest
     container_name: inception_mariadb
     restart: on-failure:5
     environment:
@@ -19,6 +20,7 @@ services:
 
   inception_wordpress:
     build: ./requirements/wordpress
+    image: inception_wordpress:latest
     container_name: inception_wordpress
     restart: always
     volumes:
@@ -43,6 +45,7 @@ services:
 
   inception_nginx:
     build: ./requirements/nginx
+    image: inception_nginx:latest
     container_name: inception_nginx
     restart: on-failure:5
     volumes:
