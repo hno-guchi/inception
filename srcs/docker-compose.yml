@@ -14,6 +14,11 @@ services:
     volumes:
       - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - inception_mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - inception_mariadb_net
 
@@ -21,7 +26,7 @@ services:
     build: ./requirements/wordpress
     image: inception_wordpress:latest
     container_name: inception_wordpress
-    restart: always
+    restart: on-failure:5
     volumes:
       - inception_wp_data:/var/www/html
     environment:
@@ -38,7 +43,8 @@ services:
       WP_SUB_PASSWORD: ${WP_SUB_PASSWORD}
       WP_SUB_EMAIL: ${WP_SUB_EMAIL}
     depends_on:
-      - inception_mariadb
+      inception_mariadb:
+        condition: service_healthy
     networks:
       - inception_mariadb_net
       - inception_wordpress_net
@@ -63,8 +69,10 @@ volumes:
 
 networks:
   inception_mariadb_net:
+    driver: bridge
     internal: true
   inception_wordpress_net:
+    driver: bridge
 
 #   mariadb:
 #     environment:

@@ -12,11 +12,11 @@ NAME = inception
 all: $(NAME)
 
 $(NAME):
-	docker-compose -f ./srcs/docker-compose.yml up -d --build
+	docker-compose --env-file ./srcs/.env -f ./srcs/docker-compose.yml up -d --build
 
 .PHONY: clean
 clean:
-	docker-compose -f ./srcs/docker-compose.yml down
+	docker-compose --env-file ./srcs/.env -f ./srcs/docker-compose.yml down
 
 .PHONY: fclean
 fclean: clean
