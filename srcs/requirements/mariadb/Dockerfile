@@ -13,9 +13,11 @@ RUN set -ex \
     && chown -R mysql:mysql /var/lib/mysql /run/mysqld \
     && chmod 1777 /var/lib/mysql /run/mysqld
 
-VOLUME /var/lib/mysql
+# RUN mkdir /docker-entrypoint-initdb.d
+# COPY ./tools/init.sql /docker-entrypoint-initdb.d/
+# COPY ./tools/create_db.sql /docker-entrypoint-initdb.d/
 
-# USER mysql
+VOLUME /var/lib/mysql
 
 COPY ./tools/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

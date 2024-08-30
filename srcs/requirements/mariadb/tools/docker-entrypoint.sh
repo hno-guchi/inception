@@ -14,28 +14,26 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     pid="$!"
 
     echo "Waiting for MariaDB to start..."
-    mysqladmin --silent --wait=30 ping
+    mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} --silent --wait=30 ping
 
     echo "Creating database and user..."
-    mysql <<-EOSQL
+    mysql -uroot -p${MYSQL_ROOT_PASSWORD} <<-EOSQL
         CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
         CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
         GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_USER}\`@'%';
-        FLUSH PRIVILEGES;
+        DROP DATABASE IF EXISTS test;
+        DELETE FROM mysql.user WHERE User='root' AND Host!='localhost';
+        DELETE FROM mysql.user WHERE User='';
         ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 EOSQL
 
     echo "Stopping MariaDB..."
-    mysqladmin shutdown
+	mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
 
     wait "$pid"
-fi
 
-# その他の初期設定やカスタム設定をここに追加可能
-# 例: タイムゾーンデータのインポートなど
-# mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root mysql
+fi
 
 # CMDで指定されたコマンドを使用してMariaDBを起動
 echo "Executing command: $@"
-# exec mysqld --user=mysql --console
 exec "$@"
