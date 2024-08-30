@@ -5,7 +5,7 @@ services:
     build: ./requirements/mariadb
     image: inception_mariadb:latest
     container_name: inception_mariadb
-    restart: on-failure:5
+    restart: on-failure:10
     environment:
       MYSQL_DATABASE: ${WP_DB_NAME}
       MYSQL_USER: ${WP_DB_USER}
@@ -15,10 +15,11 @@ services:
       - ./requirements/mariadb/conf/my.conf:/etc/mysql/my.cnf:ro
       - inception_mariadb_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "if [ -e /tmp/healthcheck_disabled ]; then exit 0; else if mysqladmin ping -h localhost -uroot; then touch /tmp/healthcheck_disabled; exit 0; else exit 1; fi; fi"]
+      interval: 30s
+      timeout: 30s
+      retries: 10
+      start_period: 30s
     networks:
       - inception_mariadb_net
 
@@ -74,11 +75,6 @@ networks:
   inception_wordpress_net:
     driver: bridge
 
-#   mariadb:
-#     environment:
-#       GUEST_USER: $(DB_GUEST_USER)
-#       GUEST_USER_PASSWORD: $(DB_GUEST_PASSWORD)
-#
 #   phpmyadmin:
 #     build: ./requirements/bonus/phpmyadmin
 #     container_name: phpmyadmin

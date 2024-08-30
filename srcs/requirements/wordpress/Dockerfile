@@ -35,12 +35,7 @@ WORKDIR /var/www/html
 
 EXPOSE 9000
 
-# HEALTHCHECK CMD curl --fail http://localhost:9000 || exit 1
 HEALTHCHECK CMD pidof php-fpm8.2 || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["php-fpm8.2", "-F"]
-
-# FROM wordpress:fpm
-
-# EXPOSE 9000
