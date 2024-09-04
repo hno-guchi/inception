@@ -8,7 +8,7 @@ RUN set -xe \
     php8.2-mbstring \
     php8.2-xml \
     php8.2-curl \
-    wget git unzip \
+    wget git unzip sendmail \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -xe \
@@ -16,8 +16,10 @@ RUN set -xe \
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
 
+COPY ./tools/latest.zip /latest.zip
+
+# && wget https://wordpress.org/latest.zip
 RUN set -xe \
-    && wget https://wordpress.org/latest.zip \
     && unzip latest.zip \
     && mkdir -p /var/www/html \
     && mv wordpress/* /var/www/html/ \
