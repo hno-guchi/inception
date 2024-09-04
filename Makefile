@@ -20,6 +20,11 @@ clean:
 
 .PHONY: fclean
 fclean: clean
+	docker volume rm srcs_inception_mariadb_data
+	docker volume rm srcs_inception_wp_data
+	docker image rm inception_nginx:latest
+	docker image rm inception_mariadb:latest
+	docker image rm inception_wordpress:latest
 
 .PHONY: re
 re: fclean all

@@ -74,19 +74,3 @@ networks:
     internal: true
   inception_wordpress_net:
     driver: bridge
-
-#   phpmyadmin:
-#     build: ./requirements/bonus/phpmyadmin
-#     container_name: phpmyadmin
-#     restart: on-failure:5
-#     ports:
-#       - "8080:80"
-#     environment:
-#       PMA_HOST: ${PMA_HOST_NAME}
-#       PMA_ALLOW_NO_PASSWORD: false
-#       PMA_USER: ${PMA_USER_NAME}
-#       PMA_PASSWORD: ${DB_ROOT_PASSWORD}
-#     depends_on:
-#       - mariadb
-#     networks:
-#       - pmanetwork
