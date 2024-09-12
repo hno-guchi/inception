@@ -3,6 +3,8 @@
 ###########
 
 NAME = inception
+ENV_FILE = ./srcs/.env
+DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
 
 #################
 # General Rules #
@@ -12,27 +14,29 @@ NAME = inception
 all: $(NAME)
 
 $(NAME):
-	docker-compose --env-file ./srcs/.env -f ./srcs/docker-compose.yml up -d --build
+	docker-compose --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_FILE) up -d
 
 .PHONY: clean
 clean:
-	docker-compose --env-file ./srcs/.env -f ./srcs/docker-compose.yml down
+	docker-compose --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_FILE) down
 
 .PHONY: fclean
 fclean: clean
+	docker system prune -f
+	docker volume prune -f
+	docker network prune -f
+
+.PHONY: re
+re: fclean all
+
+.PHONY: update
+update: clean
+	docker-compose --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_FILE) up -d --build
+
+.PHONY: delete
+delete: fclean
 	docker volume rm srcs_inception_mariadb_data
 	docker volume rm srcs_inception_wp_data
 	docker image rm inception_nginx:latest
 	docker image rm inception_mariadb:latest
 	docker image rm inception_wordpress:latest
-
-.PHONY: re
-re: fclean all
-
-.PHONY: sandbox
-sandbox:
-	docker-compose -f ./sandBox/docker-compose.yml up -d
-
-.PHONY: sandbox-clean
-sandbox-clean:
-	docker-compose -f ./sandBox/docker-compose.yml down
