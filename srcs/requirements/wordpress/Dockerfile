@@ -1,13 +1,13 @@
-FROM debian:stable-slim
+FROM debian:oldstable-slim
 
 RUN set -xe \
     && apt-get update && apt-get install -y \
-    php8.2-fpm \
-    php8.2-mysql \
-    php8.2-gd \
-    php8.2-mbstring \
-    php8.2-xml \
-    php8.2-curl \
+    php7.4-fpm \
+    php7.4-mysql \
+    php7.4-gd \
+    php7.4-mbstring \
+    php7.4-xml \
+    php7.4-curl \
     wget git unzip sendmail \
     && rm -rf /var/lib/apt/lists/*
 
@@ -27,17 +27,21 @@ RUN set -xe \
     && chown -R www-data:www-data /var/www/html
 
 # www.confファイルの設定を変更
-RUN sed -i 's|^listen = .*$|listen = 9000|' /etc/php/8.2/fpm/pool.d/www.conf
+RUN sed -i 's|^listen = .*$|listen = 9000|' /etc/php/7.4/fpm/pool.d/www.conf
 
 # 初期設定スクリプトを追加
 COPY ./tools/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# PIDファイルのディレクトリを作成し、適切な権限を設定
+RUN mkdir -p /run/php && chown www-data:www-data /run/php
+
 WORKDIR /var/www/html
 
 EXPOSE 9000
 
-HEALTHCHECK CMD pidof php-fpm8.2 || exit 1
+HEALTHCHECK CMD pidof php-fpm7.4 || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD ["php-fpm8.2", "-F"]
+# CMD ["php-fpm7.4", "-F"]
+CMD ["php-fpm7.4", "--nodaemonize"]
