@@ -34,14 +34,14 @@ update: clean
 	docker-compose --env-file $(ENV_FILE) -f $(DOCKER_COMPOSE_FILE) up -d --build
 
 .PHONY: delete
-delete: fclean
-	docker volume rm srcs_inception_mariadb_data
-	docker volume rm srcs_inception_wp_data
-	docker image rm inception_nginx:latest
-	docker image rm inception_mariadb:latest
-	docker image rm inception_wordpress:latest
-	rm -rf ./srcs/hnoguchi/mariadb/*
-	rm -rf ./srcs/hnoguchi/wordpress/*
+delete:
+	-@if [ -n "$$(docker ps -qa)" ]; then docker stop $$(docker ps -qa); else echo "No containers to stop."; fi
+	-@if [ -n "$$(docker ps -qa)" ]; then docker rm $$(docker ps -qa); else echo "No containers to remove."; fi
+	-@if [ -n "$$(docker images -qa)" ]; then docker rmi -f $$(docker images -qa); else echo "No images to remove."; fi
+	-@if [ -n "$$(docker volume ls -q)" ]; then docker volume rm $$(docker volume ls -q); else echo "No volumes to remove."; fi
+	-@if [ -n "$$(docker network ls -q)" ]; then docker network rm $$(docker network ls -q); else echo "No networks to remove."; fi
+	-rm -rf ./srcs/hnoguchi/data/mariadb/*
+	-rm -rf ./srcs/hnoguchi/data/wordpress/*
 
 .PHONY: info
 info:
