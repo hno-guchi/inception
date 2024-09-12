@@ -1,0 +1,7 @@
+version: '3'
+
+# containers
+services:
+  debian:
+    image: debian:oldstable-slim
+    tty: true

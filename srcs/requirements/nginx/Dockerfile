@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM debian:oldstable-slim
 
 RUN set -xe \
     && groupadd -r nginx \

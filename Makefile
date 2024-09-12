@@ -40,3 +40,12 @@ delete: fclean
 	docker image rm inception_nginx:latest
 	docker image rm inception_mariadb:latest
 	docker image rm inception_wordpress:latest
+	rm -rf ./srcs/hnoguchi/mariadb/*
+	rm -rf ./srcs/hnoguchi/wordpress/*
+
+.PHONY: info
+info:
+	docker image ls -a
+	docker container ls -a
+	docker volume ls
+	docker network ls
